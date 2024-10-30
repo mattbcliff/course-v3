@@ -2,6 +2,7 @@
 
 import json,fire,re
 from pathlib import Path
+import io
 
 def is_export(cell):
     if cell['cell_type'] != 'code': return False
@@ -65,8 +66,10 @@ def notebook2scriptSingle(fname):
     for cell in code_cells: module += ''.join(cell['source'][1:]) + '\n\n'
     # remove trailing spaces
     module = re.sub(r' +$', '', module, flags=re.MULTILINE)
+    if not (fname.parent/'exp').exists(): (fname.parent/'exp').mkdir()
     output_path = fname.parent/'exp'/fname_out
-    open(output_path,'w').write(module[:-2])
+    with io.open(output_path, "w", encoding="utf-8") as f:
+        f.write(module[:-2])
     print(f"Converted {fname} to {output_path}")
 
 if __name__ == '__main__': fire.Fire(notebook2script)
